@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Tebakata</title>
+</head>
+
+
+<body>
+
+	<h1>Tebakata</h1>
+	<hr>
+
+	<h3><span id="question">Loading...</span></h3>
+	<p><span id="hint"></span></p>
+	<p><span id="countdown"></span></p>
+
+	<form>
+
+		<input type="text" autocomplete="off" id="answerBox">
+
+		<button type="submit">Jawab</button>
+
+	</form>
+
+	<hr>
+
+	<div id="timeline">
+
+	</div>
+
+
+</body>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/jquery"></script>
+<script>
+
+	var socket = io();	
+	var	countdown = 0;
+	var countdownTimer;
+
+
+	var playerName = prompt('Enter player name: ');
+	socket.emit('requestjoingame', playerName);
+
+	socket.on('joingame', function (message){
+		$('#timeline').append('<p>' + message.name + ' has joined the game</p>');
+	});
+
+	socket.on('leavegame', function (message){
+		$('#timeline').append('<p>' + message.name + ' has left the game</p>');
+	});
+
+	socket.on('newword', function (message){
+		$('#question').html(message.word);
+		$('#hint').html(message.hint);
+		countdown = message.countdown;
+		$('#countdown').html(countdown);
+		clearInterval(countdownTimer);
+		countdownTimer = setInterval(countdownTick, 1000);
+	});
+
+	socket.on('answerresponse', function (message){
+		if(message.status === 'correct'){
+			$('#timeline').append('<p>' + message.player.name + ' answered "' + message.answer + '" correctly, got ' + message.score + ' point(s)</p>');
+		} else if(message.status === 'wrong'){
+			$('#timeline').append('<p>' + message.player.name + ' incorrectly answered "' + message.answer + '"</p>');
+		} else {
+			$('#timeline').append('<p>Error processing answer</p>');
+		}
+	});
+
+	$('form').submit(function(){
+		socket.emit('answer', $('#answerBox').val());
+		$('#answerBox').val('');
+		return false;
+	});
+
+	function countdownTick(){
+		if(countdown > 0){
+			countdown--;
+			$('#countdown').html(countdown);
+		}
+	};
+
+</script>
+
+</html>

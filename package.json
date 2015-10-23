@@ -1,0 +1,19 @@
+{
+  "name": "tebakata",
+  "version": "0.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "tebakata",
+    "acakata"
+  ],
+  "author": "nathanchrs",
+  "license": "MIT",
+  "dependencies": {
+    "express": "~4.13.3",
+    "socket.io": "~1.3.7"
+  }
+}
