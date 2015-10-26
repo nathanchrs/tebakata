@@ -1,2 +1,4 @@
 node_modules
 *.sublime*
+*.log
+config.json

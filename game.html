@@ -15,11 +15,11 @@
 	<p><span id="hint"></span></p>
 	<p><span id="countdown"></span></p>
 
-	<form>
+	<form id="answerForm">
 
 		<input type="text" autocomplete="off" id="answerBox">
 
-		<button type="submit">Jawab</button>
+		<button id="answerSubmit" type="submit">Jawab</button>
 
 	</form>
 
@@ -33,23 +33,25 @@
 </body>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="/js/jquery"></script>
+<script src="/js/jquery-1.11.2.min.js"></script>
 <script>
+
+	var currentPlayer = ''; //load current username with page (server-side)
 
 	var socket = io();	
 	var	countdown = 0;
 	var countdownTimer;
 
-
-	var playerName = prompt('Enter player name: ');
-	socket.emit('requestjoingame', playerName);
+	$(document).ready(function(){
+		$('#answerBox').focus();
+	});
 
 	socket.on('joingame', function (message){
-		$('#timeline').append('<p>' + message.name + ' has joined the game</p>');
+		$('#timeline').append('<p>' + message + ' has joined the game</p>');
 	});
 
 	socket.on('leavegame', function (message){
-		$('#timeline').append('<p>' + message.name + ' has left the game</p>');
+		$('#timeline').append('<p>' + message + ' has left the game</p>');
 	});
 
 	socket.on('newword', function (message){
@@ -57,18 +59,26 @@
 		$('#hint').html(message.hint);
 		countdown = message.countdown;
 		$('#countdown').html(countdown);
+		$('#answerSubmit').prop("disabled", false);
 		clearInterval(countdownTimer);
 		countdownTimer = setInterval(countdownTick, 1000);
 	});
 
 	socket.on('answerresponse', function (message){
 		if(message.status === 'correct'){
-			$('#timeline').append('<p>' + message.player.name + ' answered "' + message.answer + '" correctly, got ' + message.score + ' point(s)</p>');
+			$('#timeline').append('<p>' + message.player + ' answered correctly, got ' + message.score + ' point(s)</p>');
+			if(message.player === currentPlayer){
+				$('#answerSubmit').prop("disabled", true);
+			}
 		} else if(message.status === 'wrong'){
-			$('#timeline').append('<p>' + message.player.name + ' incorrectly answered "' + message.answer + '"</p>');
+			$('#timeline').append('<p>' + message.player + ' incorrectly answered "' + message.answer + '"</p>');
 		} else {
 			$('#timeline').append('<p>Error processing answer</p>');
 		}
+	});
+
+	socket.on('login', function (message){
+		window.location = '/login';
 	});
 
 	$('form').submit(function(){
