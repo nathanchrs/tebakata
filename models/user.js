@@ -20,6 +20,10 @@ module.exports = function(app){
 			type: String, //email
 			required: true
 		},
+		score: {
+			type: Number,
+			default: 0
+		},
 		password: {
 			type: String,
 			required: true,

@@ -1,0 +1,27 @@
+extends layout.jade
+
+block title
+	title Tebakata - Scoreboard
+
+block navbar
+	
+
+block content
+
+	h1 Tebakata #[small Scoreboard]
+
+	table.table.table-responsive.table-hover
+		thead
+			tr 
+				th Username
+				th Name
+				th Email
+				th Score
+
+		tbody
+			each user in users
+				tr
+					td= user.username
+					td= user.name
+					td= user.email
+					td= user.score

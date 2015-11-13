@@ -1,0 +1,22 @@
+extends layout.jade
+
+block title
+	title Tebakata - Register
+
+block navbar
+	
+
+block content
+
+	h1 Tebakata #[small Register]
+
+	form(method="POST", action="/register")
+		input(type="hidden", name="_csrf", value= csrfToken)
+
+		input(type="text", name="username")
+		input(type="text", name="name")
+		input(type="email", name="email")
+		input(type="password", name="password")
+		input(type="password", name="passwordConfirmation")
+
+		button(type="submit") Register

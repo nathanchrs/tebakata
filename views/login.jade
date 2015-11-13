@@ -1,0 +1,21 @@
+extends layout.jade
+
+block title
+	title Tebakata - Login
+
+block navbar
+	
+
+block content
+
+	h1 Tebakata #[small Login]
+
+	a(href="/register") Daftar
+
+	form(method="POST", action="/login")
+		input(type="hidden", name="_csrf", value= csrfToken)
+
+		input(type="text", name="username")
+		input(type="password", name="password")
+
+		button(type="submit") Login

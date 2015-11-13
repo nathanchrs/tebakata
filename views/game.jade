@@ -1,0 +1,99 @@
+extends layout.jade
+
+block title
+	title Tebakata
+
+block navbar
+	
+
+block content
+
+	h1 Tebakata
+
+	a(href="/scoreboard") Scoreboard
+	span /
+	a(href="/logout") Logout
+
+	hr
+
+	h3
+		span#question Loading...
+	p
+		span#hint
+	p
+		span#countdown
+	
+	form#answerForm
+
+		input#answerBox(type="text", autocomplete="off")
+		
+		button#answerSubmit(type="submit") Jawab
+	
+
+	hr
+
+	div#timeline
+
+block script
+
+	script(src="/socket.io/socket.io.js")
+
+	script.
+
+		var currentPlayer = '#{currentPlayer}'; //load current username with page (server-side)
+
+		var socket = io();	
+		var	countdown = 0;
+		var countdownTimer;
+
+		$(document).ready(function(){
+			$('#answerBox').focus();
+		});
+
+		socket.on('joingame', function (message){
+			$('#timeline').append('<p>' + message + ' has joined the game</p>');
+		});
+
+		socket.on('leavegame', function (message){
+			$('#timeline').append('<p>' + message + ' has left the game</p>');
+		});
+
+		socket.on('newword', function (message){
+			$('#question').html(message.word);
+			$('#hint').html(message.hint);
+			countdown = message.countdown;
+			$('#countdown').html(countdown);
+			$('#answerSubmit').prop("disabled", false);
+			clearInterval(countdownTimer);
+			countdownTimer = setInterval(countdownTick, 1000);
+		});
+
+		socket.on('answerresponse', function (message){
+			if(message.status === 'correct'){
+				$('#timeline').append('<p>' + message.player + ' answered correctly, got ' + message.score + ' point(s)</p>');
+				if(message.player === currentPlayer){
+					$('#answerSubmit').prop("disabled", true);
+				}
+			} else if(message.status === 'wrong'){
+				$('#timeline').append('<p>' + message.player + ' incorrectly answered "' + message.answer + '"</p>');
+			} else {
+				$('#timeline').append('<p>Error processing answer</p>');
+			}
+		});
+
+		socket.on('login', function (message){
+			window.location = '/login';
+		});
+
+		$('form').submit(function(){
+			socket.emit('answer', $('#answerBox').val());
+			$('#answerBox').val('');
+			return false;
+		});
+
+		function countdownTick(){
+			if(countdown > 0){
+				countdown--;
+				$('#countdown').html(countdown);
+			}
+		};

@@ -40,157 +40,159 @@ function getScore(correctAnswersBeforeNow) {
 	else return 1;
 };
 
-module.exports = function (app) { return {
+//GAME OBJECT
 
-	//TEBAKATA GLOBALS
+module.exports = function(app){
 
-	createGame: function (name) {
+	var Tebakata = function (name) {
+
+		this._isRunning = false;
+		this.name = name;
+		this.round = {
+			currentWord: {
+				question: 'Loading...',
+				hint: 'Loading...',
+				answer: 'Loading...'
+			},
+
+			countdown: 0,
+			correctPlayers: {},
+			correctPlayersCount: 0
+		};
 
 		if(createdGames[name]){
-			return false;
+			return false; //failed to create game object, a game with the same name already exists
 		} else {
-
 			createdGames[name] = true;
 			createdGamesCount++;
-
-			return {
-
-				//TODO: server-based word, answer history
-
-				_isRunning: false,
-
-				name: name, //TODO: watch out for name collisions
-
-				round: {
-
-					currentWord: {
-						question: 'Loading...',
-						hint: 'Loading...',
-						answer: 'Loading...'
-					},
-
-					countdown: 0,
-					correctPlayers: {},
-					correctPlayersCount: 0
-				},
-
-				//MAIN LOOP
-
-				_mainLoop: function () {
-
-					if(!this._isRunning) return;
-
-					if(this.round.countdown == 0){
-
-						//get a new word
-
-						var newWordIndex = getRandom(0, wordList.length-1);
-						
-						this.round.currentWord = {
-							question: shuffleWord(wordList[newWordIndex].word),
-							answer: wordList[newWordIndex].word,
-							hint: wordList[newWordIndex].hint
-						};
-
-						//reset countdown, correctPlayersCount for this round
-						this.round.countdown = app.config.countdown;
-						this.round.correctPlayers = {};
-						this.round.correctPlayersCount = 0;
-
-						//emit new word
-						app.io.to(this.name).emit('newword', {
-							word: this.round.currentWord.question,
-							hint: this.round.currentWord.hint,
-							countdown: this.round.countdown
-						});
-
-					} else {
-						this.round.countdown--;
-					}
-
-					setTimeout(this._mainLoop, 1000);
-				},
-
-				start: function(){
-
-					//setup game events
-
-					app.io.on('connection', function(socket){
-						if(socket.request.session.passport && socket.request.session.passport.user){
-
-							connectedPlayers[socket.id] = {
-								id: socket.id,
-								username: socket.request.session.passport.user.username,
-								activeGame: this.name
-							}
-							connectedPlayersCount++;
-
-							socket.on('answer', function(message){
-								if(socket.request.session.passport
-									&& socket.request.session.passport.user
-									&& connectedPlayers[socketId]
-									&& connectedPlayers[socketId].activeGame === this.name
-								){
-
-									var status = 'error';
-									var scoreDelta = 0;
-
-									if(!this.round.correctPlayers[socket.id]){ //after a player has answered correctly, cant answer again
-										if(checkAnswer(message, this.round.currentWord.answer)){
-
-											scoreDelta = getScore(this.round.correctPlayersCount);
-											
-											app.model.users.update({ username: connectedPlayers[socket.id].username }, { $inc: { score: scoreDelta }});
-											
-											this.round.correctPlayers[socket.id] = true;
-											this.round.correctPlayersCount++;
-											status = 'correct';	
-										} else {
-											status = 'wrong';
-										}
-
-										app.io.to(this.name).emit('answerresponse', {
-											player: connectedPlayers[socket.id].username,
-											answer: message,
-											status: status,
-											rank: this.round.correctPlayersCount,
-											score: scoreDelta
-										});
-									}
-								} else {
-									app.io.to(socket.id).emit('login');
-								}
-							});
-							
-							socket.on('disconnect', function (){
-								if(connectedPlayers[socket.id]){
-									app.io.to(this.name).emit('leavegame', connectedPlayers[socket.id].username);
-							 		connectedPlayers[socket.id] = undefined;
-							 		connectedPlayersCount--;
-							 	}
-							});
-
-						} else {
-							app.io.to(socket.id).emit('login');
-						}
-					});
-
-					this._isRunning = true;
-					this._mainLoop();
-				},
-
-				stop: function(){
-
-					this._isRunning = false;
-
-					//disconnect all users
-					var clients = app.io.adapter.rooms[name];
-				    for(var clientId in clients) {
-				        app.io.sockets.socket(clientId).disconnect();
-				    }
-				}
-
-			};
 		}
+
+	};
+
+	Tebakata.prototype._mainLoop = function () {
+		var self = this;
+
+		if(!this._isRunning) return;
+
+		if(this.round.countdown == 0){
+
+			//get a new word
+
+			var newWordIndex = getRandom(0, wordList.length-1);
+			
+			this.round.currentWord = {
+				question: shuffleWord(wordList[newWordIndex].word),
+				answer: wordList[newWordIndex].word,
+				hint: wordList[newWordIndex].hint
+			};
+
+			//reset countdown, correctPlayersCount for this round
+			this.round.countdown = app.config.countdown;
+			this.round.correctPlayers = {};
+			this.round.correctPlayersCount = 0;
+
+			//emit new word
+			app.io.to(self.name).emit('newword', {
+				word: self.round.currentWord.question,
+				hint: self.round.currentWord.hint,
+				countdown: self.round.countdown
+			});
+
+		} else {
+			this.round.countdown--;
+		}
+
+		setTimeout(this._mainLoop.bind(this), 1000); //needs to be bound to this object because setTimeout changes function context to global object
+	};
+
+	Tebakata.prototype.start = function(){
+		var self = this;
+
+		//setup game events
+
+		app.io.on('connection', function(socket){
+			if(socket.request.session.passport && socket.request.session.passport.user){
+
+				connectedPlayers[socket.id] = {
+					id: socket.id,
+					username: socket.request.session.passport.user,
+					activeGame: self.name
+				}
+				connectedPlayersCount++;
+
+				socket.join(self.name);
+
+				socket.on('answer', function(message){
+					if(socket.request.session.passport
+						&& socket.request.session.passport.user
+						&& connectedPlayers[socket.id]
+						&& connectedPlayers[socket.id].activeGame === self.name
+					){
+
+						var status = 'error';
+						var scoreDelta = 0;
+
+						if(!self.round.correctPlayers[socket.id]){ //after a player has answered correctly, cant answer again
+							if(checkAnswer(message, self.round.currentWord.answer)){
+
+								scoreDelta = getScore(self.round.correctPlayersCount);
+								
+								app.models.user.update({ username: connectedPlayers[socket.id].username }, { $inc: { score: scoreDelta }}, function(err, affectedCount){
+									if(err){
+										//error updating DB
+										console.log('[ ERROR ] Failed to update score on DB: ', err);
+									}
+								});
+								
+								self.round.correctPlayers[socket.id] = true;
+								self.round.correctPlayersCount++;
+								status = 'correct';
+
+							} else {
+								status = 'wrong';
+							}
+
+							app.io.to(self.name).emit('answerresponse', {
+								player: connectedPlayers[socket.id].username,
+								answer: message,
+								status: status,
+								rank: self.round.correctPlayersCount,
+								score: scoreDelta
+							});
+						}
+					} else {
+						app.io.to(socket.id).emit('login');
+					}
+				});
+				
+				socket.on('disconnect', function (){
+					if(connectedPlayers[socket.id]){
+						app.io.to(self.name).emit('leavegame', connectedPlayers[socket.id].username);
+				 		delete connectedPlayers[socket.id]; //if slow, just change to assign undefined
+				 		connectedPlayersCount--;
+				 	}
+				});
+
+			} else {
+				app.io.to(socket.id).emit('login');
+			}
+		});
+
+		this._isRunning = true;
+		this._mainLoop();
+	};
+
+	Tebakata.prototype.stop = function () {
+
+		this._isRunning = false;
+
+		//disconnect all users
+		var clients = app.io.adapter.rooms[name];
+	    for(var clientId in clients) {
+	        app.io.sockets.socket(clientId).disconnect();
+	    }
 	}
-};};
+
+	return Tebakata;
+
+};

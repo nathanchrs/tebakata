@@ -18,7 +18,7 @@ app.config = {
 
 	bcryptsaltworkfactor: 10,
 
-	countdown: 10
+	countdown: 3
 };
 
 //load custom config file
@@ -95,7 +95,7 @@ app.passport.deserializeUser(function(username, done) {
 	app.models.user.findOne({username: username}).exec(done);
 });
 
-//MIDDLEWARE
+//EXPRESS MIDDLEWARE
 //Order matters here!
 
 var bodyParser = require('body-parser');
@@ -137,8 +137,16 @@ app.io.use(function(socket, next){
 
 //GAME LOGIC
 
-var tebakata = require(path.join(__dirname, 'game.js'))(app);
-app.game = tebakata.createGame('main');
+var Tebakata = require(path.join(__dirname, 'game.js'))(app);
+app.game = new Tebakata('main');
+
+//MIDDLEWARE
+
+app.middleware = require(path.join(__dirname, 'middleware.js'))(app);
+
+//CONTROLLER
+
+app.controllers = require(path.join(__dirname, 'controllers.js'))(app);
 
 //ROUTES
 

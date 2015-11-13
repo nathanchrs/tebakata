@@ -2,27 +2,29 @@
 
 module.exports = function(app){
 
-	app.get('/', function (req, res){
+	//MAIN GAME ROUTES
 
-		//TODO: if not logged in redirect to login
+	app.get('/', app.middleware.isLoggedIn, app.controllers.showGame);
 
-		res.sendFile(path.join(__dirname,'game.html'));
-	});
 
-	app.get('/login', function (req, res){ //TODO: if already logged in redirect to /
-		res.send('TODO: login');
-	});
+	//AUTH ROUTES
 
-	app.get('/logout', function (req, res){ //TODO: if not logged in then redirect to login
-		res.send('TODO: logout');
-	});
+	app.get('/login', app.middleware.isNotLoggedIn, app.controllers.showLogin);
 
-	app.get('/register', function (req, res){
-		res.send('TODO: register');
-	});
+	app.post('/login', app.middleware.isNotLoggedIn, app.passport.authenticate('local', {
+		failureRedirect: '/login',
+		failureFlash: 'Invalid username or password'
+	}), app.controllers.login);
 
-	app.get('/scoreboard', function (req, res){
-		res.send('TODO: scoreboard');
-	});
+	app.get('/logout', app.middleware.isLoggedIn, app.controllers.logout);
+
+	app.get('/register', app.middleware.isNotLoggedIn, app.controllers.showRegister);
+
+	app.post('/register', app.middleware.isNotLoggedIn, app.controllers.register);
+
+
+	//MISC ROUTES
+
+	app.get('/scoreboard', app.controllers.showScoreboard);
 
 };
