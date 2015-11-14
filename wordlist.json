@@ -1,22 +1,90 @@
 [
 	{
-		"word":"asisten",
-		"hint":"Yang jaga Pelatnas"
+		"word":"informatika",
+		"hint":"Prodi"
 	},
 	{
-		"word":"IBM",
-		"hint":"Nama perusahaan"
+		"word":"apple",
+		"hint":"Perusahaan"
 	},
 	{
-		"word":"spidol",
-		"hint":"Alat tulis"
+		"word":"samsung",
+		"hint":"Perusahaan"
 	},
 	{
-		"word":"Tarjan",
-		"hint":"Algoritma"
+		"word":"insinyur",
+		"hint":"Pekerjaan"
 	},
 	{
-		"word":"kata yang panjang",
-		"hint":"test"
+		"word":"mahasiswa",
+		"hint":"Pekerjaan"
+	},
+	{
+		"word":"universitas",
+		"hint":"Lembaga"
+	},
+	{
+		"word":"twitter",
+		"hint":"Website"
+	},
+	{
+		"word":"facebook",
+		"hint":"Website"
+	},
+	{
+		"word":"google",
+		"hint":"Perusahaan"
+	},
+	{
+		"word":"sublime text",
+		"hint":"Text editor"
+	},
+	{
+		"word":"geany",
+		"hint":"Text editor"
+	},
+	{
+		"word":"macintosh",
+		"hint":"OS"
+	},
+	{
+		"word":"haskell",
+		"hint":"Bahasa pemrograman"
+	},
+	{
+		"word":"lua",
+		"hint":"Bahasa pemrograman"
+	},
+	{
+		"word":"java",
+		"hint":"Bahasa pemrograman"
+	},
+	{
+		"word":"mainframe",
+		"hint":"Komputer"
+	},
+	{
+		"word":"laptop",
+		"hint":"Alat elektronik"
+	},
+	{
+		"word":"printer",
+		"hint":"Alat elektronik"
+	},
+	{
+		"word":"kamus",
+		"hint":"Referensi"
+	},
+	{
+		"word":"ensiklopedia",
+		"hint":"Referensi"
+	},
+	{
+		"word":"perpustakaan",
+		"hint":"Tempat"
+	},
+	{
+		"word":"programmer",
+		"hint":"Pekerjaan"
 	}
 ]

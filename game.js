@@ -17,15 +17,19 @@ function getRandom(min, max) {
 
 function shuffleWord(word) {
 
-	for(var i = 0; i<getRandom(3, word.length+3); i++){
+	var words = word.trim().split(' ');
 
-		var start = getRandom(0, word.length-1);
-		var end = getRandom(start, word.length-1);
+	for(var w = 0; w<words.length; w++){
+		for(var i = 0; i<getRandom(3, words[w].length+3); i++){
 
-		word = word.substring(0,start) + word.substring(start, end+1).split('').reverse().join('') + word.substring(end+1, word.length);
+			var start = getRandom(0, words[w].length-1);
+			var end = getRandom(start, words[w].length-1);
+
+			words[w] = words[w].substring(0,start) + words[w].substring(start, end+1).split('').reverse().join('') + words[w].substring(end+1, words[w].length);
+		}
 	}
 
-	return word;
+	return words.join(' ');
 };
 
 

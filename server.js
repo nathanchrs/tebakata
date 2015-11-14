@@ -18,7 +18,7 @@ app.config = {
 
 	bcryptsaltworkfactor: 10,
 
-	countdown: 3
+	countdown: 10
 };
 
 //load custom config file
