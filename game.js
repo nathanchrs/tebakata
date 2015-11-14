@@ -123,6 +123,7 @@ module.exports = function(app){
 					activeGame: self.name
 				}
 				connectedPlayersCount++;
+				app.io.to(self.name).emit('joingame', connectedPlayers[socket.id].username);
 
 				socket.join(self.name);
 
