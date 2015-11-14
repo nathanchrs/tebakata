@@ -13,7 +13,7 @@ return {
 	},
 
 	showLogin: function(req, res, next){
-		res.render('login', { csrfToken: req.csrfToken(), error: req.flash('error') });
+		res.render('login', { csrfToken: req.csrfToken(), error: req.flash('error'), success: req.flash('success') });
 	},
 
 	login: function(req, res, next){
@@ -23,13 +23,13 @@ return {
 	},
 
 	logout: function(req, res, next){
-		req.flash('success', 'Logged out successfully');
+		req.flash('success', 'Logout berhasil');
 		req.logout();
 		res.redirect('/login');
 	},
 
 	showRegister: function(req, res, next){
-		res.render('register', { csrfToken: req.csrfToken(), error: req.flash('error') });
+		res.render('register', { csrfToken: req.csrfToken(), error: req.flash('error'), success: req.flash('success') });
 	},
 
 	register: function(req, res, next){
@@ -41,7 +41,7 @@ return {
 			password: req.body.password
 		});
 		if(req.body.password !== req.body.passwordConfirmation){
-			user.invalidate('passwordConfirmation', 'Password and its confirmation must be equal');
+			user.invalidate('passwordConfirmation', 'Password dan konfirmasi password harus sama');
 		}
 
 		user.save(function(err, createdUser, affectedCount){
@@ -55,7 +55,7 @@ return {
 			}
 
 			req.login(createdUser, function(err){
-				req.flash('success', 'Successfully registered user');
+				req.flash('success', 'Data tersimpan');
 				res.redirect('/');
 			});
 		});
@@ -65,7 +65,8 @@ return {
 		User.find().sort({ score: -1 }).select({ username: 1, name: 1, score: 1 }).exec(function(err, users){
 			if(err) return next(err);
 				
-			res.render('scoreboard', { users: users, error: req.flash('error'), success: req.flash('success') });
+			var currentPlayer = req.user ? req.user.username : undefined;
+			res.render('scoreboard', { currentPlayer: currentPlayer, users: users, error: req.flash('error'), success: req.flash('success') });
 		});
 	}
 

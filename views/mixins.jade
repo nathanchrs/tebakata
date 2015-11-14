@@ -1,0 +1,49 @@
+
+mixin navbar(page)
+
+	nav.navbar.navbar-default
+		div.container-fluid
+			div.navbar-header
+				button.navbar-toggle.collapsed(type="button", data-toggle="collapse", data-target="#main-navbar-collapse", aria-expanded="false")
+					span.sr-only Toggle menu
+					span.icon-bar
+					span.icon-bar
+					span.icon-bar
+				a.navbar-brand.tebakata-logo(href="/") Tebakata
+
+			div.collapse.navbar-collapse#main-navbar-collapse
+
+				div.btn-group.navbar-right(role="group")
+					
+					if page !== 'scoreboard'
+						a(href="/scoreboard").btn.navbar-btn.btn-default Scoreboard #[span.glyphicon.glyphicon-list-alt]
+
+					if currentPlayer
+						a(href="/scoreboard").btn.navbar-btn.btn-default= currentPlayer
+						a(href="/logout").btn.navbar-btn.btn-default
+							span.sr-only Logout
+							span.glyphicon.glyphicon-log-out
+					else
+						if page === 'register'
+							a(href="/").btn.navbar-btn.btn-primary Login #[span.glyphicon.glyphicon-log-in]
+						else
+							a(href="/register").btn.navbar-btn.btn-success Daftar #[span.glyphicon.glyphicon-edit]
+
+
+mixin footer
+
+	footer
+		div.container-fluid
+			p nathanchrs &copy; 2015 - #[a(href="https://github.com/nathanchrs/tebakata") Github]
+
+mixin notification
+
+	div#notification-container
+
+		if error && error != ''
+			div.alert.alert-danger.alert-dismissible= error
+				button.close(type="button", data-dismiss="alert") &times;
+
+		if success && success != ''
+			div.alert.alert-success.alert-dismissible= success
+				button.close(type="button", data-dismiss="alert") &times;

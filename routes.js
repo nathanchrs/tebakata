@@ -13,7 +13,7 @@ module.exports = function(app){
 
 	app.post('/login', app.middleware.isNotLoggedIn, app.passport.authenticate('local', {
 		failureRedirect: '/login',
-		failureFlash: 'Invalid username or password'
+		failureFlash: 'Username atau password salah'
 	}), app.controllers.login);
 
 	app.get('/logout', app.middleware.isLoggedIn, app.controllers.logout);

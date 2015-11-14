@@ -1,3 +1,5 @@
+include mixins.jade
+
 doctype html
 
 html(lang="en")
@@ -8,7 +10,8 @@ html(lang="en")
 
 		block title
 
-		link(href="/css/bootstrap.min.css", rel="stylesheet")
+		link(href="/css/bootswatch-lumen.min.css", rel="stylesheet")
+		link(href="/css/tebakata.css", rel="stylesheet")
 
 		block stylesheet
 
@@ -23,10 +26,13 @@ html(lang="en")
 
 		block navbar
 
+		+notification
+
 		block content
 
+		+footer
+
 		script(src="/js/jquery-1.11.2.min.js")
-		//script(src="/js/bootstrap.min.js")
-		//script(src="/js/ie10-viewport-bug-workaround.js")
+		script(src="/js/bootstrap.min.js")
 
 		block script

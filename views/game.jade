@@ -4,41 +4,79 @@ block title
 	title Tebakata
 
 block navbar
-	
+	+navbar('game')
 
 block content
 
-	h1 Tebakata
+	div.container-fluid
 
-	a(href="/scoreboard") Scoreboard
-	span /
-	a(href="/logout") Logout
-
-	hr
-
-	h3
-		span#question Loading...
-	p
-		span#hint
-	p
-		span#countdown
-	
-	form#answerForm
-
-		input#answerBox(type="text", autocomplete="off")
+		div.game-question
+			span#question Loading...
 		
-		button#answerSubmit(type="submit") Jawab
-	
+		div.game-hint
+			span#hint
+			span.badge#countdown
 
-	hr
+		div#timeline
 
-	div#timeline
+		form.game-form#answerForm
+			div.input-group
+				input.form-control#answerBox(type="text", autocomplete="off")
+				span.input-group-btn
+					button.btn.btn-primary#answerSubmit(type="submit") Jawab
 
 block script
 
 	script(src="/socket.io/socket.io.js")
 
 	script.
+
+		//TODO: tidy up script
+		//TODO: add time in timeline
+
+		var TIMELINE_LIMIT = 100;
+		var BOTTOM_OFFSET = 80;
+		var SCROLL_THRESHOLD = 5;
+
+		var elementCount = 0;
+
+		function adjustTimelineSize(){
+			var newHeight = $(window).height() - $('#answerForm').height() - $('#timeline').offset().top - BOTTOM_OFFSET;
+			if(newHeight < 0) newHeight = 0;
+			$('#timeline').height(newHeight);
+		}
+
+		function escapeOutput(str) {
+		    var div = document.createElement('div');
+		    div.appendChild(document.createTextNode(str));
+		    return div.innerHTML;
+		};
+
+		function appendTimeline(type, content, forceScroll){
+			var timeline = $('#timeline');
+
+			var extracontent = '';
+			if(type === 'correct') extracontent = '<span class="icon glyphicon glyphicon-ok"></span>&nbsp;';
+			if(type === 'wrong') extracontent = '<span class="icon glyphicon glyphicon-remove"></span>&nbsp;';
+			if(type === 'error') extracontent = '<span class="icon glyphicon glyphicon-exclamation-sign"></span>&nbsp;';
+			if(type === 'joingame') extracontent = '<span class="icon glyphicon glyphicon-log-in"></span>&nbsp;';
+			if(type === 'leavegame') extracontent = '<span class="icon glyphicon glyphicon-log-out"></span>&nbsp;';
+
+			timeline.append('<div class="event ' + type + '">' + extracontent + content + '</div>');
+
+			var scrolledMax = Math.abs(timeline[0].scrollHeight - timeline.scrollTop()) <= SCROLL_THRESHOLD;
+			if(forceScroll || scrolledMax) timeline.animate({scrollTop: timeline.prop('scrollHeight')});
+
+			if(elementCount >= TIMELINE_LIMIT){
+				timeline[0].removeChild(timeline[0].firstChild);
+			} else {
+				elementCount++;
+			}
+		}
+
+		adjustTimelineSize();
+
+		$(window).resize(adjustTimelineSize);
 
 		var currentPlayer = '#{currentPlayer}'; //load current username with page (server-side)
 
@@ -51,11 +89,12 @@ block script
 		});
 
 		socket.on('joingame', function (message){
-			$('#timeline').append('<p>' + message + ' has joined the game</p>');
+			appendTimeline('joingame', escapeOutput(message) + ' has joined the game');
 		});
 
 		socket.on('leavegame', function (message){
-			$('#timeline').append('<p>' + message + ' has left the game</p>');
+			appendTimeline('leavegame', escapeOutput(message) + ' has left the game');
+
 		});
 
 		socket.on('newword', function (message){
@@ -66,18 +105,19 @@ block script
 			$('#answerSubmit').prop("disabled", false);
 			clearInterval(countdownTimer);
 			countdownTimer = setInterval(countdownTick, 1000);
+			adjustTimelineSize();
 		});
 
 		socket.on('answerresponse', function (message){
 			if(message.status === 'correct'){
-				$('#timeline').append('<p>' + message.player + ' answered correctly, got ' + message.score + ' point(s)</p>');
+				appendTimeline('correct', escapeOutput(message.player) + ' answered correctly, got ' + escapeOutput(message.score) + ' point(s)', message.player === currentPlayer);
 				if(message.player === currentPlayer){
 					$('#answerSubmit').prop("disabled", true);
 				}
 			} else if(message.status === 'wrong'){
-				$('#timeline').append('<p>' + message.player + ' incorrectly answered "' + message.answer + '"</p>');
+				appendTimeline('wrong', escapeOutput(message.player) + ' incorrectly answered "' + escapeOutput(message.answer) + '"', message.player === currentPlayer);
 			} else {
-				$('#timeline').append('<p>Error processing answer</p>');
+				appendTimeline('error', 'Error processing answer');
 			}
 		});
 

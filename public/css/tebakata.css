@@ -1,0 +1,96 @@
+
+@import url(https://fonts.googleapis.com/css?family=Patrick+Hand+SC);
+
+footer {
+	text-align:center;
+}
+
+#notification-container {
+  position:fixed;
+  top: 60px;
+  right: 15px;
+  width: 350px;
+  z-index: 9999;
+}
+
+@media (max-width: 767px) {
+  #notification-container {
+    width: auto;
+    left:10px;
+  }
+}
+
+.tebakata-logo {
+	font-family: 'Patrick Hand SC', cursive;
+	font-size: 1.6em;
+}
+
+.tebakata-logo.large {
+	text-align: center;
+	font-size: 14vh;
+	margin: 50px 0;
+}
+
+.center-form {
+	margin: 3% auto;
+	max-width: 350px;
+	padding: 10px 5px;
+}
+
+
+.game-question {
+	text-align: center;
+	font-family: 'Patrick Hand SC', cursive;
+	font-size: 12vh;
+	line-height: 0.9;
+	margin: 5px;
+	margin-top: 0;
+}
+
+.game-hint {
+	text-align: center;
+	font-size: 4vh;
+	margin-bottom: 15px;
+}
+
+.game-hint #hint {
+	font-family: 'Patrick Hand SC', cursive;
+	margin: 5px;
+}
+
+.game-hint #countdown {
+	background-color: #337ab7;
+	font-size: 3vh;
+}
+
+.game-form {
+	margin: 10px auto;
+	max-width: 600px;
+	padding: 10px 10px;
+}
+
+#timeline {
+	text-align: center;
+	overflow-y: scroll;
+	height: 250px;
+}
+
+#timeline .event {
+	padding: 5px 0;
+}
+
+#timeline .event time {
+	color: #aaa;
+}
+
+#timeline .event.correct .icon {
+	color: #4cae4c;
+}
+
+#timeline .event.wrong .icon, #timeline .event.error .icon {
+	color: #f5070a;
+}
+
+#timeline .event.joingame .icon, #timeline .event.leavegame .icon {
+	color: #337ab7;
+}

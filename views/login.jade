@@ -4,18 +4,27 @@ block title
 	title Tebakata - Login
 
 block navbar
-	
+	+navbar('login')
 
 block content
 
-	h1 Tebakata #[small Login]
+	div.container-fluid
 
-	a(href="/register") Daftar
+		h1.tebakata-logo.large Tebakata
 
-	form(method="POST", action="/login")
-		input(type="hidden", name="_csrf", value= csrfToken)
+		form.center-form#login-form(method="POST", action="/login")
+			input(type="hidden", name="_csrf", value= csrfToken)
 
-		input(type="text", name="username")
-		input(type="password", name="password")
+			div.form-group
+				label(for="username").sr-only Username
+				input.form-control#username(type="text", name="username", placeholder="Username", required)
 
-		button(type="submit") Login
+			div.form-group
+				label(for="password").sr-only Password
+				input.form-control#password(type="password", name="password", placeholder="Password", required)
+
+			div.btn-group.btn-group-justified(role="group")
+				a.btn.btn-success(href="/register") Daftar #[span.glyphicon.glyphicon-edit]
+				a.btn.btn-primary(onclick="$('#login-form').submit()") Login #[span.glyphicon.glyphicon-log-in]
+
+			input(type="submit", style="position: absolute; left: -100px; width: 1px; height: 1px;", tabindex="-1")

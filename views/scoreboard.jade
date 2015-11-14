@@ -4,24 +4,33 @@ block title
 	title Tebakata - Scoreboard
 
 block navbar
-	
+	+navbar('scoreboard')
 
 block content
 
-	h1 Tebakata #[small Scoreboard]
+	div.container
 
-	table.table.table-responsive.table-hover
-		thead
-			tr 
-				th Username
-				th Name
-				th Email
-				th Score
+		h1
+			small
+				a(href="/")
+					span.glyphicon.glyphicon-chevron-left
+			| &nbsp;Scoreboard
+		br
 
-		tbody
-			each user in users
-				tr
-					td= user.username
-					td= user.name
-					td= user.email
-					td= user.score
+		table.table.table-responsive.table-hover
+			thead
+				tr 
+					th Username
+					th Name
+					th Email
+					th Score
+
+			tbody
+				each user in users
+					tr
+						td= user.username
+						td= user.name
+						td= user.email
+						td= user.score
+
+		br
