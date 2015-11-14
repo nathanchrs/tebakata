@@ -42,24 +42,29 @@ Notes:
 
 - Openshift may suspend the application if it idles (no HTTP request) for more than a day.
 - Server time uses Openshift default time, not UTC+7.
+- Useful RHC commands: `rhc setup`, `rhc setup -l <account-email>`, `rhc ssh tebakata`, `rhc apps`, `rhc show-app tebakata`
 
 ## Development
 
 The server-side game logic is contained in `game.js`, in the Tebakata class.
 The client-side game logic is mostly in `views\game.jade`.
 The wordlist is available in JSON format in `wordlist.json`. Contributions are very welcome.
+Contributions to the design of this site are also welcome.
 
 ### Todo
 
 - Wordlist
-- Tidy up code
-- Add timestamp to events
-- Add server-side event history
-- Scoreboard live update using socket.io
 - Better UI
-- Game rooms with different word categories
 - Online players count
+- Add timestamp to events
+- Tidy up code
+- Add server-side event history
+- Prevent answering if answerBox is empty
+- Scoreboard filter
+- Scoreboard live update using socket.io
+- Game rooms with different word categories
 - English version
-- Facebook/Google/Twitter login
+- Facebook/Google/Twitter login, player profiles
 - Achievements
+- Password reset, email confirmation
 - Player profile, stats graph
